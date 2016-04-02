@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "smtp-server": "*"
+    "smtp-server": "*",
+	"mailparser": "*"
 }	,
   "author": "",
   "license": "BSD-2-Clause"
