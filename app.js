@@ -44,7 +44,7 @@ function storeEmail(mail_object)
 {
     mail_object.user_id = this.user_id;
     mail_object.mapil_email = this.mapil_email;
-    
+    mail_object.received_at = new Date();
     // wipe the content of the attachments - we don't store these at this time
     for(var x in mail_object.attachments) {
         mail_object.attachments[x].content = null;
@@ -59,7 +59,7 @@ function storeEmail(mail_object)
         }
 
         // insert the record
-        db.collection('emails').insertOne({}, function(err, result) {
+        db.collection('emails').insertOne(mail_object, function(err, result) {
             if(err) console.log(err);
         });
     });
