@@ -10,7 +10,8 @@
     	"smtp-server": "*",
 	"mongodb": "*",
 	"mailparser": "*",
-	"node-env-file": "*"
+	"node-env-file": "*",
+    "pg": "*"
 }	,
   "author": "",
   "license": "BSD-2-Clause"

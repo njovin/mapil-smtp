@@ -3,6 +3,7 @@ var MongoClient = require('mongodb').MongoClient;
 var smtpServer = require('smtp-server').SMTPServer;
 var MailParser = require("mailparser").MailParser;
 var mailparser = new MailParser();
+var pg = require('pg');
 
 // setup the server listener
 env(__dirname + '/.env');
@@ -11,10 +12,6 @@ var server = new smtpServer({
 	banner: "mail.mapil.co",
 	size: 10485760,
 	disabledCommands: ['AUTH'],
-	onMailFrom: function(address, session, cb) {
-		console.log('from ' + address.address);
-		return cb();
-	},
 	onData: function(stream, session, callback){
 		var email = '';
 		stream.on('data', function(buffer) {
@@ -27,14 +24,35 @@ var server = new smtpServer({
 		});
 	},
 	onRcptTo: function(address, session, cb) {
-		console.log('recip to ' + address.address);
-	        if(address.address.substr(-14) !== '@mail.mapil.co'){
-	            return cb(new Error('Only mail for mapil.co is accepted'));
-        	}
-		return cb();
+        address.address = address.address.toLowerCase();
+        // make sure the doman is valid
+        if(address.address.substr(-14) !== '@mail.mapil.co'){
+            return cb(new Error('Only mail for mail.mapil.co is accepted'));
+    	}
+        // make sure the address is valid 
+        return validateEmailAddress(address,cb);
 	}
 });
 
+
+function validateEmailAddress(address, cb) {
+    pg.connect(process.env.POSTGRES_CONNECTION, function(err, client, done) {
+        if(err) {
+            return console.error('error fetching client from pool', err);
+        }
+        client.query('SELECT * FROM email_addresses WHERE email = $1 AND deleted_at IS NULL', [address], function(err, result) {
+        done();
+        if(err) {
+            return console.error('error running query', err);
+        }
+        if(result.rowCount < 1) {
+            return cb(new Error('Unrecognized address'));
+        } else {
+            return cb();
+        }
+        });
+    });    
+}
 // handle the end of mail input
 mailparser.on("end", function(mail_object){
     
