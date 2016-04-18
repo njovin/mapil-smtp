@@ -22,6 +22,7 @@ var server = new smtpServer({
             mailparser.user_id = session.user_id;
            	mailparser.write(email);
        		mailparser.end();	
+            mailparser.on("end", storeEmail);
 		});
 	},
 	onRcptTo: function(address, session, cb) {
@@ -35,8 +36,10 @@ var server = new smtpServer({
 	}
 });
 
+server.listen(25);
+
 // handle the end of mail input
-mailparser.on("end", function(mail_object){
+function storeEmail(mail_object){
 
     // wipe the content of the attachments - we don't store these at this time
     for(var x in mail_object.attachments) {
@@ -56,9 +59,8 @@ mailparser.on("end", function(mail_object){
             if(err) console.log(err);
         });
     });
-});
+}
 
-server.listen(25);
 
 function validateEmailAddress(address, session, cb) {
     pg.connect(process.env.POSTGRES_CONNECTION, function(err, client, done) {
