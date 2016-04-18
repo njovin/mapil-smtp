@@ -32,15 +32,17 @@ var server = new smtpServer({
             return cb(new Error('Only mail for mail.mapil.co is accepted'));
     	}
         // make sure the address is valid 
-        validateEmailAddress(address.address,cb);
+        validateEmailAddress(address.address,session,cb);
 	}
 });
 
 server.listen(25);
 
 // handle the end of mail input
-function storeEmail(mail_object){
-
+function storeEmail(mail_object)
+{
+    mail_object.user_id = this.user_id;
+    
     // wipe the content of the attachments - we don't store these at this time
     for(var x in mail_object.attachments) {
         mail_object.attachments[x].content = null;
