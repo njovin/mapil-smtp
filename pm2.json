@@ -1,0 +1,8 @@
+{
+    "apps": [
+        {
+            "name": "mapil-smtp",
+            "script": "./app.js"
+        }
+    ]
+}
