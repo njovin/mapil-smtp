@@ -7,8 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "smtp-server": "*",
-	"mailparser": "*"
+    	"smtp-server": "*",
+	"mongodb": "*",
+	"mailparser": "*",
+	"node-env-file": "*"
 }	,
   "author": "",
   "license": "BSD-2-Clause"
