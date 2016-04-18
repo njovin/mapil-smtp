@@ -20,6 +20,7 @@ var server = new smtpServer({
 		stream.on('end', function() {
             var mailparser = new MailParser();
             mailparser.user_id = session.user_id;
+            mailparser.mapil_email = session.mapil_email;
            	mailparser.write(email);
        		mailparser.end();	
             mailparser.on("end", storeEmail);
@@ -42,6 +43,7 @@ server.listen(25);
 function storeEmail(mail_object)
 {
     mail_object.user_id = this.user_id;
+    mail_object.mapil_email = this.mapil_email;
     
     // wipe the content of the attachments - we don't store these at this time
     for(var x in mail_object.attachments) {
@@ -57,7 +59,7 @@ function storeEmail(mail_object)
         }
 
         // insert the record
-        db.collection('emails').insertOne(mail_object, function(err, result) {
+        db.collection('emails').insertOne({}, function(err, result) {
             if(err) console.log(err);
         });
     });
@@ -78,6 +80,7 @@ function validateEmailAddress(address, session, cb) {
                 return cb(new Error('Unrecognized address'));
             } else {
                 session.user_id = result.rows[0].user_id;
+                session.mapil_email = result.rows[0].email;
                 return cb();
             }
         });
