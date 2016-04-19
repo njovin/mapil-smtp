@@ -25,6 +25,7 @@ var server = new smtpServer({
        		mailparser.end();	
             mailparser.on("end", storeEmail);
 		});
+        callback();
 	},
 	onRcptTo: function(address, session, cb) {
         address.address = address.address.toLowerCase();
