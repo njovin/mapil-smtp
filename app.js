@@ -3,6 +3,7 @@ var MongoClient = require('mongodb').MongoClient;
 var smtpServer = require('smtp-server').SMTPServer;
 var MailParser = require("mailparser").MailParser;
 var pg = require('pg');
+var http = require('http');
 
 // setup the server listener
 env(__dirname + '/.env');
