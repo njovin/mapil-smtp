@@ -40,7 +40,11 @@ var server = new smtpServer({
 
 server.listen(25);
 
-// handle the end of mail input
+/**
+ * Store the email in mongo
+ * @param  {[type]} mail_object [description]
+ * @return {[type]}             [description]
+ */
 function storeEmail(mail_object)
 {
     mail_object.user_id = this.user_id;
@@ -66,7 +70,13 @@ function storeEmail(mail_object)
     });
 }
 
-
+/**
+ * Validate that an email address exists in the system
+ * @param  {[type]}   address [description]
+ * @param  {[type]}   session [description]
+ * @param  {Function} cb      [description]
+ * @return {[type]}           [description]
+ */
 function validateEmailAddress(address, session, cb) {
     pg.connect(process.env.POSTGRES_CONNECTION, function(err, client, done) {
         if(err) {
@@ -87,3 +97,19 @@ function validateEmailAddress(address, session, cb) {
         });
     });    
 }
+
+/**
+ * Send a heartbeat HTTP request to our service monitor 
+ * @return {[type]} [description]
+ */
+function sendHeartbeat() 
+{
+    http.get(process.env.HEARTBEAT_URL, function(res) {
+            setTimeout(sendHeartbeat,60000);
+        }).on('error', function(e) {
+            setTimeout(sendHeartbeat,60000);
+            console.log("Error sending heartbeat: " + e);
+    });
+}
+
+sendHeartbeat();
