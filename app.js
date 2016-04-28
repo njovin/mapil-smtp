@@ -5,19 +5,23 @@ var MailParser = require("mailparser").MailParser;
 var pg = require('pg');
 var http = require('http');
 
-// setup the server listener
+// load the .env file, if any
 env(__dirname + '/.env');
+
+// spin up the SMTP server
 var server = new smtpServer({
-	name: "mapil-smtp",
-	banner: "mail.mapil.co",
-	size: 10485760,
+	name: process.env.SMTP_SERVER_NAME,
+	banner: process.env.SMTP_BANNER,
+	size: process.env.MAX_MESSAGE_SIZE,
 	disabledCommands: ['AUTH'],
+
 	onData: function(stream, session, callback){
 		var email = '';
 		stream.on('data', function(buffer) {
     		var part = buffer.toString();
     		email += part;
 		});
+
 		stream.on('end', function() {
             var mailparser = new MailParser();
             mailparser.user_id = session.user_id;
@@ -28,18 +32,22 @@ var server = new smtpServer({
 		});
         callback();
 	},
+
 	onRcptTo: function(address, session, cb) {
+
         address.address = address.address.toLowerCase();
+        
         // make sure the doman is valid
-        if(address.address.substr(-14) !== '@mail.mapil.co'){
-            return cb(new Error('Only mail for mail.mapil.co is accepted'));
+        if(address.address.substr(-14) !== '@' + process.env.SMTP_HOST_CHECK){
+            return cb(new Error('Only mail for ' + process.env.SMTP_HOST_CHECK + ' is accepted'));
     	}
+        
         // make sure the address is valid 
         validateEmailAddress(address.address,session,cb);
 	}
 });
 
-server.listen(25);
+server.listen(process.env.SMTP_PORT);
 
 /**
  * Store the email in mongo
@@ -58,6 +66,7 @@ function storeEmail(mail_object)
 
     // connect to mongo
     MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+
         // log any errors
         if(err) {
             console.log(err);
@@ -65,7 +74,7 @@ function storeEmail(mail_object)
         }
 
         // insert the record
-        db.collection('emails').insertOne(mail_object, function(err, result) {
+        db.collection(process.env.MONGO_MESSAGE_COLLECTION).insertOne(mail_object, function(err, result) {
             if(err) console.log(err);
         });
     });
@@ -113,4 +122,6 @@ function sendHeartbeat()
     });
 }
 
-sendHeartbeat();
+if(process.env.HEARTBEAT_ENABLED) {
+    sendHeartbeat();
+}
