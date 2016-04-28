@@ -5,4 +5,6 @@ Addresses are validated against a PostgreSQL database and messages are stored in
 
 See .env-sample for configuration options.
 
+See [https://github.com/njovin/mapil-web](https://github.com/njovin/mapil-web) for the web component.
+
 
