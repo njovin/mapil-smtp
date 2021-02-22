@@ -27,7 +27,7 @@ var server = new smtpServer({
             mailparser.user_id = session.user_id;
             mailparser.mapil_email = session.mapil_email;
            	mailparser.write(email);
-       		mailparser.end();	
+       			mailparser.end();
             mailparser.on("end", storeEmail);
 		});
         callback();
@@ -36,13 +36,14 @@ var server = new smtpServer({
 	onRcptTo: function(address, session, cb) {
 
         address.address = address.address.toLowerCase();
-        
+
+				console.info('Mail received for ' + address.address, err);
         // make sure the doman is valid
         if(address.address.substr(-14) !== '@' + process.env.SMTP_HOST_CHECK){
             return cb(new Error('Only mail for ' + process.env.SMTP_HOST_CHECK + ' is accepted'));
     	}
-        
-        // make sure the address is valid 
+
+        // make sure the address is valid
         validateEmailAddress(address.address,session,cb);
 	}
 });
@@ -105,14 +106,14 @@ function validateEmailAddress(address, session, cb) {
                 return cb();
             }
         });
-    });    
+    });
 }
 
 /**
- * Send a heartbeat HTTP request to our service monitor 
+ * Send a heartbeat HTTP request to our service monitor
  * @return {[type]} [description]
  */
-function sendHeartbeat() 
+function sendHeartbeat()
 {
     http.get(process.env.HEARTBEAT_URL, function(res) {
             setTimeout(sendHeartbeat,60000);
