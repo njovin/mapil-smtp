@@ -4,6 +4,7 @@ var smtpServer = require('smtp-server').SMTPServer;
 var MailParser = require("mailparser").MailParser;
 var pg = require('pg');
 var http = require('http');
+var axios = require('axios');
 
 // load the .env file, if any
 env(__dirname + '/.env');
@@ -27,7 +28,7 @@ var server = new smtpServer({
             mailparser.user_id = session.user_id;
             mailparser.mapil_email = session.mapil_email;
            	mailparser.write(email);
-       			mailparser.end();
+       		mailparser.end();
             mailparser.on("end", storeEmail);
 		});
         callback();
@@ -77,6 +78,13 @@ function storeEmail(mail_object)
         // insert the record
         db.collection(process.env.MONGO_MESSAGE_COLLECTION).insertOne(mail_object, function(err, result) {
             if(err) console.log(err);
+            axios.post('https://mapil.co/internal/webhook', mail_object)
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         });
     });
 }
