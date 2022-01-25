@@ -38,7 +38,7 @@ var server = new smtpServer({
 
         address.address = address.address.toLowerCase();
 
-				console.info('Mail received for ' + address.address, err);
+        console.info('Mail received for ' + address.address);
         // make sure the doman is valid
         if(address.address.substr(-14) !== '@' + process.env.SMTP_HOST_CHECK){
             return cb(new Error('Only mail for ' + process.env.SMTP_HOST_CHECK + ' is accepted'));
