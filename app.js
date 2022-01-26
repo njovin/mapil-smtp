@@ -66,6 +66,8 @@ function storeEmail(mail_object)
     mail_object.user_id = this.user_id;
     mail_object.mapil_email = this.mapil_email;
     mail_object.received_at = new Date();
+    let webhook_url = this.webhook_url;
+
     // wipe the content of the attachments - we don't store these at this time
     for(var x in mail_object.attachments) {
         mail_object.attachments[x].content = null;
@@ -84,8 +86,8 @@ function storeEmail(mail_object)
         db.collection(process.env.MONGO_MESSAGE_COLLECTION).insertOne(mail_object, function(err, result) {
             if(err) console.log(err);
 
-            if (this.webhook_url) {
-                request.post({url: this.webhook_url, body: mail_object, json:true}, function (error, response, body) {
+            if (webhook_url) {
+                request.post({url: webhook_url, body: mail_object, json:true}, function (error, response, body) {
                     console.error('error:', error); // Print the error if one occurred
                     console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
                     console.log('body:', body); // Print the HTML for the Google homepage.
