@@ -101,7 +101,6 @@ function storeEmail(mail_object)
  */
 function validateEmailAddress(address, session, cb) {
     pool.query('SELECT * FROM email_addresses WHERE email = $1 AND deleted_at IS NULL', [address], function(err, result) {
-        done();
         if(err) {
             return console.error('error running query', err);
         }
