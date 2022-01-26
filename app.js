@@ -31,6 +31,7 @@ var server = new smtpServer({
             var mailparser = new MailParser();
             mailparser.user_id = session.user_id;
             mailparser.mapil_email = session.mapil_email;
+            mailparser.webhook_url = session.webhook_url;
            	mailparser.write(email);
        		mailparser.end();
             mailparser.on("end", storeEmail);
@@ -100,7 +101,7 @@ function storeEmail(mail_object)
  * @return {[type]}           [description]
  */
 function validateEmailAddress(address, session, cb) {
-    pool.query('SELECT * FROM email_addresses WHERE email = $1 AND deleted_at IS NULL', [address], function(err, result) {
+    pool.query('SELECT u.webhook_url, e.* FROM email_addresses e JOIN users u ON u.id = e.user_id WHERE e.email = $1 AND e.deleted_at IS NULL', [address], function(err, result) {
         if(err) {
             return console.error('error running query', err);
         }
@@ -109,6 +110,7 @@ function validateEmailAddress(address, session, cb) {
         } else {
             session.user_id = result.rows[0].user_id;
             session.mapil_email = result.rows[0].email;
+            session.webhook_url = result.rows[0].webhook_url;
             return cb();
         }
     });
