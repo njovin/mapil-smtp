@@ -2,11 +2,15 @@ var env = require('node-env-file');
 var MongoClient = require('mongodb').MongoClient;
 var smtpServer = require('smtp-server').SMTPServer;
 var MailParser = require("mailparser").MailParser;
-var pg = require('pg');
+const { Pool, Client } = require('pg')
 var http = require('http');
 
 // load the .env file, if any
 env(__dirname + '/.env');
+
+const pool = new Pool({
+    process.env.POSTGRES_CONNECTION,
+});
 
 // spin up the SMTP server
 var server = new smtpServer({
@@ -89,23 +93,18 @@ function storeEmail(mail_object)
  * @return {[type]}           [description]
  */
 function validateEmailAddress(address, session, cb) {
-    pg.connect(process.env.POSTGRES_CONNECTION, function(err, client, done) {
+    pool.query('SELECT * FROM email_addresses WHERE email = $1 AND deleted_at IS NULL', [address], function(err, result) {
+        done();
         if(err) {
-            return console.error('error fetching client from pool', err);
+            return console.error('error running query', err);
         }
-        client.query('SELECT * FROM email_addresses WHERE email = $1 AND deleted_at IS NULL', [address], function(err, result) {
-            done();
-            if(err) {
-                return console.error('error running query', err);
-            }
-            if(result.rowCount < 1) {
-                return cb(new Error('Unrecognized address'));
-            } else {
-                session.user_id = result.rows[0].user_id;
-                session.mapil_email = result.rows[0].email;
-                return cb();
-            }
-        });
+        if(result.rowCount < 1) {
+            return cb(new Error('Unrecognized address'));
+        } else {
+            session.user_id = result.rows[0].user_id;
+            session.mapil_email = result.rows[0].email;
+            return cb();
+        }
     });
 }
 

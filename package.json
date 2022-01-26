@@ -10,9 +10,9 @@
     "mailparser": "0.5.*",
     "mongodb": "2.1.*",
     "node-env-file": "0.1.*",
-    "pg": "4.5.*",
+    "pg": "^8.7.1",
     "smtp-server": "1.9.*",
-    "request": "2.*"
+    "request": "^2.88.2"
   },
   "author": "",
   "license": "BSD-2-Clause"
