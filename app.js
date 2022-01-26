@@ -84,8 +84,8 @@ function storeEmail(mail_object)
         db.collection(process.env.MONGO_MESSAGE_COLLECTION).insertOne(mail_object, function(err, result) {
             if(err) console.log(err);
 
-            if (mail_object.webhook_url) {
-                request.post({url: mail_object.webhook_url, body: mail_object, json:true}, function (error, response, body) {
+            if (this.webhook_url) {
+                request.post({url: this.webhook_url, body: mail_object, json:true}, function (error, response, body) {
                     console.error('error:', error); // Print the error if one occurred
                     console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
                     console.log('body:', body); // Print the HTML for the Google homepage.
