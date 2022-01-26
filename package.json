@@ -11,7 +11,8 @@
     "mongodb": "2.1.*",
     "node-env-file": "0.1.*",
     "pg": "4.5.*",
-    "smtp-server": "1.9.*"
+    "smtp-server": "1.9.*",
+    "request": "1.0.0"
   },
   "author": "",
   "license": "BSD-2-Clause"
