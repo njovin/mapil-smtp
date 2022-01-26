@@ -11,7 +11,6 @@
     "mongodb": "2.1.*",
     "node-env-file": "0.1.*",
     "pg": "4.5.*",
-    "request": "^1.0.0",
     "smtp-server": "1.9.*"
   },
   "author": "",
