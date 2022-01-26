@@ -10,7 +10,7 @@ var request = require('request');
 env(__dirname + '/.env');
 
 const pool = new Pool({
-    process.env.POSTGRES_CONNECTION,
+    connectionString: process.env.POSTGRES_CONNECTION,
 });
 
 // spin up the SMTP server
