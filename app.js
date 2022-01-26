@@ -4,6 +4,7 @@ var smtpServer = require('smtp-server').SMTPServer;
 var MailParser = require("mailparser").MailParser;
 var pg = require('pg');
 var http = require('http');
+var https = require('https');
 
 // load the .env file, if any
 env(__dirname + '/.env');
@@ -77,13 +78,17 @@ function storeEmail(mail_object)
         // insert the record
         db.collection(process.env.MONGO_MESSAGE_COLLECTION).insertOne(mail_object, function(err, result) {
             if(err) console.log(err);
-            http.get("https://mapil.co/internal/smtp-webhook?id=" + mail_object._id, function(res) {
+            console.log('requesting');
+            console.log(JSON.stringify(mail_object));
+            console.log( mail_object._id);
+            console.log("https://mapil.co/internal/smtp-webhook?id=" + mail_object._id);
+            https.get("https://mapil.co/internal/smtp-webhook?id=" + mail_object._id, function(res) {
                 console.log('webhook ok');
             }).on('error', function(e) {
                 console.log('webhook not ok');
-                console.log(e);
+                console.log(e);``
             });
-            console.log(JSON.stringify(result));
+
         });
     });
 }
